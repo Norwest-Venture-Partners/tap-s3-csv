@@ -50,14 +50,12 @@ def infer(key, datum, date_overrides, infer_types=True, check_second_call=False)
 
 
 def count_sample(sample, counts, table_spec):
-    infer_types = table_spec.get('infer_types', True)
-    if infer_types is False:
-        LOGGER.info(f"Type inference is turned off (infer_types is False) - all columns will be str")
     for key, value in sample.items():
         if key not in counts:
             counts[key] = {}
 
         date_overrides = table_spec.get('date_overrides', [])
+        infer_types = table_spec.get('infer_types', True)
         datatype = infer(key, value, date_overrides, infer_types=infer_types)
 
         if datatype is not None:

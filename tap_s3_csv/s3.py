@@ -141,6 +141,9 @@ def get_sampled_schema_for_table(config, table_spec):
             'anyOf': [{'type': 'object', 'properties': {}}, {'type': 'string'}]}}
     }
 
+    if table_spec.get('infer_types', True) is False:
+        LOGGER.info(f"Type inference is turned off (infer_types is False) - all columns will be str")
+
     data_schema = conversion.generate_schema(samples, table_spec)
 
     return {
