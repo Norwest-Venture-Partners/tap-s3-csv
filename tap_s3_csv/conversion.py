@@ -3,10 +3,13 @@ import singer
 LOGGER = singer.get_logger()
 
 #pylint: disable=too-many-return-statements
-def infer(key, datum, date_overrides, check_second_call=False):
+def infer(key, datum, date_overrides, infer_types=True, check_second_call=False):
     """
     Returns the inferred data type
     """
+    if infer_types:
+        return 'string'
+    
     if datum is None or datum == '':
         return None
 
@@ -47,12 +50,15 @@ def infer(key, datum, date_overrides, check_second_call=False):
 
 
 def count_sample(sample, counts, table_spec):
+    infer_types = table_spec.get('infer_types', True)
+    if infer_types is False:
+        LOGGER.info(f"Type inference is turned off (infer_types is False) - all columns will be str")
     for key, value in sample.items():
         if key not in counts:
             counts[key] = {}
 
         date_overrides = table_spec.get('date_overrides', [])
-        datatype = infer(key, value, date_overrides)
+        datatype = infer(key, value, date_overrides, infer_types=infer_types)
 
         if datatype is not None:
             counts[key][datatype] = counts[key].get(datatype, 0) + 1
