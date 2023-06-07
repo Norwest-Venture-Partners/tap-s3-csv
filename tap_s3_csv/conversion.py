@@ -7,7 +7,7 @@ def infer(key, datum, date_overrides, infer_types=True, check_second_call=False)
     """
     Returns the inferred data type
     """
-    if infer_types:
+    if infer_types is False:
         return 'string'
     
     if datum is None or datum == '':
