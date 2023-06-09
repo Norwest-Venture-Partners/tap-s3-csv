@@ -146,9 +146,19 @@ def get_sampled_schema_for_table(config, table_spec):
 
     data_schema = conversion.generate_schema(samples, table_spec)
 
+    data_schema_ = dict(data_schema)
+
+    selected_properties = table_spec.get('selected_properties', []) 
+    if selected_properties:
+        key_properties = table_spec.get('key_properties')
+        if key_properties and not all(k in selected_properties for k in key_properties):
+            raise ValueError("All key properties must be inclusive in the selected properties. Please check your tables configuration.")
+        LOGGER.info(f"Selecting for only the following properties: {selected_properties}")
+        data_schema_['properties'] =  {k: v for k,v in data_schema_['properties'].items() if k in selected_properties}
+
     return {
         'type': 'object',
-        'properties': merge_dicts(data_schema, metadata_schema)
+        'properties': merge_dicts(data_schema_, metadata_schema)
     }
 
 def merge_dicts(first, second):
